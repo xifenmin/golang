@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const TIME_OUT = 30
+const TIME_OUT = 60
 
 type ClientConnPoolError struct {
 	desc string
