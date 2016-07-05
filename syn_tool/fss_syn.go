@@ -9,7 +9,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
-	"gopkg.in/fatih/set.v0"
+	"github.com/fatih/set"
 	"log"
 	"os"
 	"strings"
