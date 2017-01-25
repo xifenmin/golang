@@ -6,11 +6,11 @@ import (
 
 func main() {
 
-	pool := NewClientPool("192.168.104.168", 5779, 100000)
+	pool := NewClientPool("10.24.233.78", 18899, 70000)
 
 	str := []byte("123456789.abcdefg")
 
-	for i := 0; i < 20000; i++ {
+	for i := 0; i < 2000; i++ {
 		_, err := pool.GetConn()
 		if err != nil {
 			return

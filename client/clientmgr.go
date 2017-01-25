@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"strconv"
+	"time"
+	"log"
 )
 
 type ClientConnPoolError struct {
@@ -101,10 +103,63 @@ func (this *ClientConn) SendData(data []byte) int {
 		fmt.Printf("send data fail:%s\n", this.conn.RemoteAddr())
 		return 0
 	}
+
+	this.RecvData()
+
 	return datalen
+}
+
+func (this *ClientConn) getHex(data []byte, datalen int) string {
+
+	var str string
+
+	for i := 0; i < datalen; i++ {
+		str += fmt.Sprintf("%s", data[i])
+	}
+
+	return str
+}
+
+func (this *ClientConn) RecvData() {
+	buf := make([]byte, 4096)
+	_, err := this.conn.Read(buf)
+
+	var str string
+
+	if err != nil {
+		fmt.Printf("Close socket %s,%s\n", time.Now().Format("2006-01-02 15:04:05"), this.conn.RemoteAddr().String())
+		this.Close()
+	}
+
+	str = this.conn.RemoteAddr().String() + "-----" + string(buf[:])//this.getHex(buf, datalen)
+	fmt.Printf("%s",str)
+	//this.data <- str
 }
 
 func (this *ClientConn) Close() error {
 	err := this.conn.Close()
 	return err
 }
+
+func (this *ClientConn) readChannel() {
+
+	for {
+		_, ok := <-this.data
+
+		if !ok {
+			log.Println("Channel is Close!!\n")
+			break
+		}
+
+		select {
+		case msg := <-this.data:
+			log.Printf("Read Data from Channel:%s,%s\n", time.Now().Format("2006-01-02 15:04:05"), msg)
+		}
+	}
+}
+
+func (this *ClientConn) Run() {
+	go this.RecvData()
+	go this.readChannel()
+}
+
